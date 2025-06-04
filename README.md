@@ -99,9 +99,9 @@ Ensure the following are installed and configured on your system:
 
    This command installs the plugin (e.g., `libros2_plugin.so`) to `${MUJOCO_PATH}/mujoco_plugin/`. This path is typically searched by MuJoCo by default.
 
-### Setting up MuJoCo Plugin Path
+### Registering the plugin
 
-MuJoCo needs to locate the compiled plugin. The `make install` step usually places it in a standard location. If you install it elsewhere, or MuJoCo cannot find it, you might need to:
+MuJoCo needs to register the plugin for every simulation, the installation step usually places it in a standard location so that it can be automatically registered. If you install it elsewhere, or MuJoCo cannot find it, you might need to:
 
 - **Option 1:** Move the library output file manually to the `mujoco_plugin` folder located at the same directory as the mujoco executable.
 - **Option 2:**: Register the plugin manually by calling the `ROS2Plugin::register_plugin()` function before the mujoco simulate loop.
