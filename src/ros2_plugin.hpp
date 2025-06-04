@@ -21,8 +21,8 @@ public:
      * @brief Configuration options for the ROS2 plugin.
      */
     struct Config {
-        std::string ros_namespace;     // Namespace for ROS2 topics
         std::string node_name;         // Name for the plugin ROS2 node
+        std::string ros_namespace;     // Namespace for ROS2 topics
         int         topic_queue_size;  // Queue size for ROS2 topics
     };
 
@@ -73,21 +73,37 @@ private:
 
     /**
      * @brief Create ROS2 publishers for sensor data.
+     *
+     * @param model MuJoCo model pointer.
      */
     void create_sensor_publishers(const mjModel* model);
 
     /**
      * @brief Create ROS2 subscribers for actuator commands.
+     *
+     * @param model MuJoCo model pointer.
      */
     void create_actuator_subscribers(const mjModel* model);
 
     /**
-     * @brief Plugin configuration attributes.
+     * @brief ROS namespace attribute key.
      */
-    ///@{
     static constexpr const char* attr_key_ros_namespace = "ros_namespace";
+
+    /**
+     * @brief Topic queue size attribute key.
+     */
     static constexpr const char* attr_key_topic_queue_size = "topic_queue_size";
-    ///@}
+
+    /**
+     * @brief ROS namespace attribute default value.
+     */
+    static constexpr const char* attr_default_ros_namespace = "mujoco/";
+
+    /**
+     * @brief Topic queue size attribute default value.
+     */
+    static constexpr int attr_default_topic_queue_size = 1;
 
     /**
      * @brief Flag to check if the ROS2 topics have been initialized.
@@ -105,20 +121,24 @@ private:
     int topic_queue_size;
 
     /**
-     * @brief Arrays to hold sensor and actuator indexes.
+     * @brief Array to hold sensors indexes.
      */
-    ///@{
     std::vector<IndexData> sensors;
-    std::vector<IndexData> actuators;
-    ///@}
 
     /**
-     * @brief Publishers for sensor data.
+     * @brief Array to hold actuators indexes.
      */
-    ///@{
-    std::vector<rclcpp::Publisher<example_interfaces::msg::Float64>::SharedPtr>           double_sensor_publishers;
+    std::vector<IndexData> actuators;
+
+    /**
+     * @brief Publishers for sensor data of double type.
+     */
+    std::vector<rclcpp::Publisher<example_interfaces::msg::Float64>::SharedPtr> double_sensor_publishers;
+
+    /**
+     * @brief Publishers for sensor data of multi-array type.
+     */
     std::vector<rclcpp::Publisher<example_interfaces::msg::Float64MultiArray>::SharedPtr> multiarray_sensor_publishers;
-    ///@}
 
     /**
      * @brief Subscribers for actuator commands.

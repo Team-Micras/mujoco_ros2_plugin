@@ -23,9 +23,14 @@ std::string read_string_attr(const char* value, const std::string& default_value
 
 Ros2Plugin::Config Ros2Plugin::get_config_from_model(const mjModel* model, int instance) {
     Config config;
-    config.ros_namespace = read_string_attr(mj_getPluginConfig(model, instance, attr_key_ros_namespace), "mujoco/");
     config.node_name = "mujoco_" + std::to_string(instance);
-    config.topic_queue_size = read_int_attr(mj_getPluginConfig(model, instance, attr_key_topic_queue_size), 1);
+
+    config.ros_namespace =
+        read_string_attr(mj_getPluginConfig(model, instance, attr_key_ros_namespace), attr_default_ros_namespace);
+
+    config.topic_queue_size =
+        read_int_attr(mj_getPluginConfig(model, instance, attr_key_topic_queue_size), attr_default_topic_queue_size);
+
     return config;
 }
 
