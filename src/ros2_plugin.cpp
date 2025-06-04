@@ -174,6 +174,10 @@ void Ros2Plugin::register_plugin() {
     };
 
     plugin.destroy = +[](mjData* data, int instance) {
+        if (rclcpp::ok()) {
+            rclcpp::shutdown();
+        }
+
         delete std::bit_cast<Ros2Plugin*>(data->plugin_data[instance]);
         data->plugin_data[instance] = 0;
     };
