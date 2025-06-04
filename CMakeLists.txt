@@ -17,8 +17,8 @@ if(MUJOCO_PATH)
     message(STATUS "Mujoco found at: ${MUJOCO_PATH}")
 else()
     message(FATAL_ERROR
-        "Mujoco program not found at expected path: ${MUJOCO_PATH}\n"
-        "Define the MUJOCO_PATH environment variable or add the binary folder to the PATH"
+        "Mujoco program not found.\n"
+        "Define the MUJOCO_PATH environment variable or add the binary folder to the PATH."
     )
 endif()
 
