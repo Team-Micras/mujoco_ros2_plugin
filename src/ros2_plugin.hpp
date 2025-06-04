@@ -15,14 +15,15 @@ namespace mujoco::plugin::ros2 {
  * This plugin allows Mujoco to communicate with ROS2 by publishing sensor data
  * and subscribing to actuator commands.
  */
-class Ros2Plugin {
+class Ros2Plugin : public rclcpp::Node {
 public:
     /**
      * @brief Configuration options for the ROS2 plugin.
      */
     struct Config {
-        std::string ros_namespace = "mujoco/";  // Namespace for ROS2 topics
-        int         topic_queue_size = 1;       // Queue size for ROS2 topics
+        std::string ros_namespace;     // Namespace for ROS2 topics
+        std::string node_name;         // Name for the plugin ROS2 node
+        int         topic_queue_size;  // Queue size for ROS2 topics
     };
 
     /**
@@ -31,11 +32,6 @@ public:
      * @param config Configuration options for the plugin.
      */
     explicit Ros2Plugin(const Config& config);
-
-    /**
-     * @brief Destroy the Ros2Plugin object.
-     */
-    ~Ros2Plugin();
 
     /**
      * @brief Reset ROS 2 Plugin cleaning up all publishers and subscribers.
@@ -65,17 +61,6 @@ public:
      * @return Configuration for the ROS2 plugin.
      */
     static Config get_config_from_model(const mjModel* model, int instance);
-
-protected:
-    /**
-     * @brief Special member functions declared as default.
-     */
-    ///@{
-    Ros2Plugin(const Ros2Plugin&) = default;
-    Ros2Plugin(Ros2Plugin&&) = default;
-    Ros2Plugin& operator=(const Ros2Plugin&) = default;
-    Ros2Plugin& operator=(Ros2Plugin&&) = default;
-    ///@}
 
 private:
     /**
@@ -118,11 +103,6 @@ private:
      * @brief Queue size for ROS 2 topics.
      */
     int topic_queue_size;
-
-    /**
-     * @brief ROS2 node handle.
-     */
-    rclcpp::Node::SharedPtr node;
 
     /**
      * @brief Arrays to hold sensor and actuator indexes.

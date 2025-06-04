@@ -24,29 +24,18 @@ std::string read_string_attr(const char* value, const std::string& default_value
 Ros2Plugin::Config Ros2Plugin::get_config_from_model(const mjModel* model, int instance) {
     Config config;
     config.ros_namespace = read_string_attr(mj_getPluginConfig(model, instance, attr_key_ros_namespace), "mujoco/");
+    config.node_name = model->names + model->name_pluginadr[instance];
     config.topic_queue_size = read_int_attr(mj_getPluginConfig(model, instance, attr_key_topic_queue_size), 1);
     return config;
 }
 
 Ros2Plugin::Ros2Plugin(const Config& config) :
-    ros_namespace(config.ros_namespace), topic_queue_size(config.topic_queue_size) {
-    if (rclcpp::ok()) {
-        RCLCPP_INFO(rclcpp::get_logger("mujoco"), "ROS2 already initialized");
-        rclcpp::shutdown();
-    }
-
-    rclcpp::init(0, nullptr);
-    this->node = rclcpp::Node::make_shared("mujoco_ros2_plugin");
-    RCLCPP_INFO(this->node->get_logger(), "ROS2 Mujoco Plugin node started");
-}
-
-Ros2Plugin::~Ros2Plugin() {
-    RCLCPP_INFO(this->node->get_logger(), "Destroying ROS2 Plugin instance");
-    rclcpp::shutdown();
+    Node(config.node_name, "mujoco/"), ros_namespace(config.ros_namespace), topic_queue_size(config.topic_queue_size) {
+    RCLCPP_INFO(this->get_logger(), "ROS2 Mujoco Plugin node started");
 }
 
 void Ros2Plugin::create_sensor_publishers(const mjModel* model) {
-    RCLCPP_INFO(this->node->get_logger(), "Creating sensor publishers for %d sensors", model->nsensor);
+    RCLCPP_INFO(this->get_logger(), "Creating sensor publishers for %d sensors", model->nsensor);
 
     for (int i = 0; i < model->nsensor; i++) {
         const char*       sensor_name = model->names + model->name_sensoradr[i];
@@ -57,20 +46,18 @@ void Ros2Plugin::create_sensor_publishers(const mjModel* model) {
         auto sensor_datatype = static_cast<mjtDataType>(model->sensor_datatype[i]);
 
         if (num_dimensions == 1) {
-            auto pub =
-                this->node->create_publisher<example_interfaces::msg::Float64>(topic_name, this->topic_queue_size);
+            auto pub = this->create_publisher<example_interfaces::msg::Float64>(topic_name, this->topic_queue_size);
             double_sensor_publishers.push_back(pub);
             pub_index = static_cast<int>(double_sensor_publishers.size() - 1);
         } else {
-            auto pub = this->node->create_publisher<example_interfaces::msg::Float64MultiArray>(
-                topic_name, this->topic_queue_size
-            );
+            auto pub =
+                this->create_publisher<example_interfaces::msg::Float64MultiArray>(topic_name, this->topic_queue_size);
             multiarray_sensor_publishers.push_back(pub);
             pub_index = static_cast<int>(multiarray_sensor_publishers.size() - 1);
         }
 
         RCLCPP_INFO(
-            this->node->get_logger(), "Created publisher for sensor '%s' of type %d with data type %d on topic '%s'",
+            this->get_logger(), "Created publisher for sensor '%s' of type %d with data type %d on topic '%s'",
             sensor_name, model->sensor_type[i], sensor_datatype, topic_name.c_str()
         );
 
@@ -81,9 +68,9 @@ void Ros2Plugin::create_sensor_publishers(const mjModel* model) {
 void Ros2Plugin::create_actuator_subscribers(const mjModel* model) {
     for (int i = 0; i < model->nu; i++) {
         const char* actuator_name = model->names + model->name_actuatoradr[i];
-        std::string topic_name = this->ros_namespace + "actuators/" + std::string(actuator_name) + "/command";
+        std::string topic_name = this->ros_namespace + "actuators/" + actuator_name + "/command";
 
-        auto sub = this->node->create_subscription<example_interfaces::msg::Float64>(
+        auto sub = this->create_subscription<example_interfaces::msg::Float64>(
             // NOLINTNEXTLINE(performance-unnecessary-value-param)
             topic_name, this->topic_queue_size, [](const example_interfaces::msg::Float64::SharedPtr /*msg*/) {}
         );
@@ -92,8 +79,7 @@ void Ros2Plugin::create_actuator_subscribers(const mjModel* model) {
         this->actuators.push_back({i, static_cast<int>(actuator_subscribers.size() - 1)});
 
         RCLCPP_INFO(
-            this->node->get_logger(), "Created subscriber for actuator '%s' on topic '%s'", actuator_name,
-            topic_name.c_str()
+            this->get_logger(), "Created subscriber for actuator '%s' on topic '%s'", actuator_name, topic_name.c_str()
         );
     }
 }
@@ -137,7 +123,7 @@ void Ros2Plugin::compute(const mjModel* model, mjData* data) {
 }
 
 void Ros2Plugin::reset() {
-    RCLCPP_INFO(this->node->get_logger(), "Resetting ROS2 Plugin state from instance");
+    RCLCPP_INFO(this->get_logger(), "Resetting ROS2 Plugin state from instance");
     this->initialized = false;
     this->sensors.clear();
     this->actuators.clear();
@@ -162,25 +148,29 @@ void Ros2Plugin::register_plugin() {
     plugin.nstate = +[](const mjModel* /*model*/, int /*instance*/) { return 0; };
 
     plugin.init = +[](const mjModel* model, mjData* data, int instance) {
-        Config config = get_config_from_model(model, instance);
-        auto*  ros2 = new Ros2Plugin(config);
+        if (not rclcpp::ok()) {
+            rclcpp::init(0, nullptr);
+        }
 
-        if (ros2 == nullptr) {
+        Config config = get_config_from_model(model, instance);
+        auto*  ros2_plugin = new Ros2Plugin(config);
+
+        if (ros2_plugin == nullptr) {
             return -1;
         }
 
-        data->plugin_data[instance] = std::bit_cast<uintptr_t>(ros2);
+        data->plugin_data[instance] = std::bit_cast<uintptr_t>(ros2_plugin);
         return 0;
     };
 
     plugin.reset = +[](const mjModel* /*model*/, mjtNum* /*plugin_state*/, void* plugin_data, int /*instance*/) {
-        auto* ros2 = std::bit_cast<Ros2Plugin*>(plugin_data);
-        ros2->reset();
+        auto* ros2_plugin = std::bit_cast<Ros2Plugin*>(plugin_data);
+        ros2_plugin->reset();
     };
 
     plugin.compute = +[](const mjModel* model, mjData* data, int instance, int /*capability_bit*/) {
-        auto* ros2 = std::bit_cast<Ros2Plugin*>(data->plugin_data[instance]);
-        ros2->compute(model, data);
+        auto* ros2_plugin = std::bit_cast<Ros2Plugin*>(data->plugin_data[instance]);
+        ros2_plugin->compute(model, data);
     };
 
     plugin.destroy = +[](mjData* data, int instance) {
