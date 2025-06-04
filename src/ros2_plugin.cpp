@@ -1,12 +1,12 @@
+#include <bit>
 #include <mujoco/mjplugin.h>
 #include <mujoco/mujoco.h>
 
 #include "ros2_plugin.hpp"
 
 namespace mujoco::plugin::ros2 {
-
-static constexpr char attr_key_ros_namespace[] = "ros_namespace";
-static constexpr char attr_key_topic_queue_size[] = "topic_queue_size";
+static constexpr const char* attr_key_ros_namespace = "ros_namespace";
+static constexpr const char* attr_key_topic_queue_size = "topic_queue_size";
 
 int read_int_attr(const char* value, int default_value) {
     if (value == nullptr || value[0] == '\0') {
@@ -87,7 +87,8 @@ void ROS2Plugin::create_actuator_subscribers(const mjModel* model) {
         std::string topic_name = this->ros_namespace + "actuators/" + std::string(actuator_name) + "/command";
 
         auto sub = this->node->create_subscription<example_interfaces::msg::Float64>(
-            topic_name, this->topic_queue_size, [](const example_interfaces::msg::Float64::SharedPtr msg) {}
+            // NOLINTNEXTLINE(performance-unnecessary-value-param)
+            topic_name, this->topic_queue_size, [](const example_interfaces::msg::Float64::SharedPtr /*msg*/) {}
         );
 
         actuator_subscribers.push_back(sub);
@@ -171,22 +172,22 @@ void ROS2Plugin::register_plugin() {
             return -1;
         }
 
-        data->plugin_data[instance] = reinterpret_cast<uintptr_t>(ros2);
+        data->plugin_data[instance] = std::bit_cast<uintptr_t>(ros2);
         return 0;
     };
 
     plugin.reset = +[](const mjModel* /*model*/, mjtNum* /*plugin_state*/, void* plugin_data, int /*instance*/) {
-        auto* ros2 = reinterpret_cast<ROS2Plugin*>(plugin_data);
+        auto* ros2 = std::bit_cast<ROS2Plugin*>(plugin_data);
         ros2->reset();
     };
 
     plugin.compute = +[](const mjModel* model, mjData* data, int instance, int /*capability_bit*/) {
-        auto* ros2 = reinterpret_cast<ROS2Plugin*>(data->plugin_data[instance]);
+        auto* ros2 = std::bit_cast<ROS2Plugin*>(data->plugin_data[instance]);
         ros2->compute(model, data);
     };
 
     plugin.destroy = +[](mjData* data, int instance) {
-        delete reinterpret_cast<ROS2Plugin*>(data->plugin_data[instance]);
+        delete std::bit_cast<ROS2Plugin*>(data->plugin_data[instance]);
         data->plugin_data[instance] = 0;
     };
 

@@ -12,6 +12,7 @@ Checks:
   -cppcoreguidelines-narrowing-conversions,
   -cppcoreguidelines-pro-type-union-access,
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-owning-memory,
   google-*,
   llvm-*,
   -llvm-header-guard,
