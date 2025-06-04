@@ -1,7 +1,7 @@
 #include <mujoco/mjplugin.h>
 #include <mujoco/mujoco.h>
 
-#include "ros2.hpp"
+#include "ros2_plugin.hpp"
 
 namespace mujoco::plugin::ros2 {
 

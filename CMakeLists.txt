@@ -30,7 +30,7 @@ find_package(rclcpp REQUIRED)
 find_package(example_interfaces REQUIRED)
 
 add_library(ros_plugin SHARED)
-target_sources(ros_plugin PRIVATE "src/ros2.cpp" "src/register.cpp")
+target_sources(ros_plugin PRIVATE "src/ros2_plugin.cpp" "src/register.cpp")
 target_include_directories(ros_plugin PRIVATE "${MUJOCO_PATH}/../include")
 
 target_link_libraries(ros_plugin mujoco)

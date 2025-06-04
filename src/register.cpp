@@ -1,6 +1,6 @@
 #include <mujoco/mjplugin.h>
 
-#include "ros2.hpp"
+#include "ros2_plugin.hpp"
 
 namespace mujoco::plugin::ros2 {
 mjPLUGIN_LIB_INIT {
