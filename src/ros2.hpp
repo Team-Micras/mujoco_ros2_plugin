@@ -3,7 +3,6 @@
 
 #include <example_interfaces/msg/float64.hpp>
 #include <example_interfaces/msg/float64_multi_array.hpp>
-#include <memory>
 #include <mujoco/mjdata.h>
 #include <mujoco/mjmodel.h>
 #include <rclcpp/rclcpp.hpp>
@@ -14,7 +13,7 @@ class ROS2Plugin {
 public:
     struct Config {
         std::string ros_namespace = "mujoco/";
-        int topic_queue_size = 1;
+        int         topic_queue_size = 1;
     };
 
     explicit ROS2Plugin(const Config& config);
@@ -23,11 +22,11 @@ public:
 
     void reset();
 
-    void compute(const mjModel* m, mjData* d, int instance);
+    void compute(const mjModel* model, mjData* data);
 
     static void register_plugin();
 
-    static Config get_config_from_model(const mjModel* m, int instance);
+    static Config get_config_from_model(const mjModel* model, int instance);
 
 private:
     struct IndexData {
@@ -38,15 +37,15 @@ private:
     /**
      * @brief Create ROS2 publishers for sensor data.
      */
-    void create_sensor_publishers(const mjModel* m);
+    void create_sensor_publishers(const mjModel* model);
 
     /**
      * @brief Create ROS2 subscribers for actuator commands.
      */
-    void create_actuator_subscribers(const mjModel* m);
+    void create_actuator_subscribers(const mjModel* model);
 
     std::string ros_namespace;
-    int topic_queue_size;
+    int         topic_queue_size;
 
     rclcpp::Node::SharedPtr node;
 
