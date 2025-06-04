@@ -41,7 +41,6 @@ MuJoCo Plugin for integrating with ROS 2
 
 This plugin acts as a bridge, allowing sensor data to flow from MuJoCo to ROS 2, and actuator commands from ROS 2 back into your MuJoCo simulation. It's designed to be straightforward to use and configure, facilitating rapid development and testing of robotic systems.
 
-
 ## 🚀 Features
 
 - **ROS 2 Node Integration**: Automatically initializes and manages a dedicated ROS 2 node (`mujoco_ros2_plugin`).
@@ -57,7 +56,6 @@ This plugin acts as a bridge, allowing sensor data to flow from MuJoCo to ROS 2,
   - Adjust the queue size for ROS 2 publishers and subscribers (default: `1`).
 - **Passive MuJoCo Plugin**: Operates within MuJoCo's simulation loop for timely data exchange.
 - **Easy to Build & Install**: Standard CMake build process.
-
 
 ## 🛠 Prerequisites
 
@@ -80,7 +78,7 @@ Ensure the following are installed and configured on your system:
 ### Building from Source
 
 1. **Set `MUJOCO_PATH` (if needed)**:
-   If MuJoCo isn't found automatically, export the `MUJOCO_PATH`:
+   If MuJoCo isn't found automatically at your `PATH`, export the `MUJOCO_PATH`:
 
    ```bash
    export MUJOCO_PATH="/path/to/your/mujoco/bin" # e.g., $HOME/.mujoco/mujoco-3.1.3/bin
@@ -89,53 +87,24 @@ Ensure the following are installed and configured on your system:
 2. **Compile the Plugin**:
 
    ```bash
-   mkdir build && cd build
-   cmake ..
-   make -j$(nproc)
+   cmake -B build
+   cmake --build build
    ```
 
 3. **Install the Plugin Library**:
 
    ```bash
-   sudo make install
+   cmake --install build
    ```
 
    This command installs the plugin (e.g., `libros_plugin.so`) to `${MUJOCO_PATH}/mujoco_plugin/`. This path is typically searched by MuJoCo by default.
-
-Start the build process by creating a build folder inside the project root:
-
-```bash
-mkdir build && cd build
-```
-
-And then generating the build commands:
-
-```bash
-cmake ..
-```
-
-The project can then be compiled by running:
-
-```bash
-make -j
-```
 
 ### Setting up MuJoCo Plugin Path
 
 MuJoCo needs to locate the compiled plugin. The `make install` step usually places it in a standard location. If you install it elsewhere, or MuJoCo cannot find it, you might need to:
 
-- **Option 1 (Recommended if installed to standard path):** The default installation path `${MUJOCO_PATH}/mujoco_plugin/` should be automatically discoverable by MuJoCo.
-- **Option 2: Use `MUJOCO_PLUGIN_PATH`**:
-  Add the directory containing `libros_plugin.so` to this environment variable:
-
-  ```bash
-  export MUJOCO_PLUGIN_PATH="/path/to/plugin_directory:${MUJOCO_PLUGIN_PATH}"
-  ```
-
-- **Option 3: Copy to Model Directory**: Place the plugin library in the same directory as your MJCF model file.
-- **Option 4: Copy to User Plugin Directory**: `~/.mujoco/plugin/` (Linux/macOS) or `C:\Users\<UserName>\.mujoco\plugin\` (Windows).
-
----
+- **Option 1:** Move the library output file manually to the `mujoco_plugin` folder located at the same directory as the mujoco executable.
+- **Option 2:**: Register the plugin manually by calling the `ROS2Plugin::register_plugin()` function before the mujoco simulate loop.
 
 ## ▶️ Usage
 
