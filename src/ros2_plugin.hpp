@@ -10,12 +10,12 @@
 namespace mujoco::plugin::ros2 {
 
 /**
- * @brief ROS2 Plugin for Mujoco to handle sensor data publishing and actuator command subscribing.
+ * @brief ROS 2 Plugin for Mujoco to handle sensor data publishing and actuator command subscribing.
  *
  * This plugin allows Mujoco to communicate with ROS2 by publishing sensor data
  * and subscribing to actuator commands.
  */
-class ROS2Plugin {
+class Ros2Plugin {
 public:
     /**
      * @brief Configuration options for the ROS2 plugin.
@@ -26,16 +26,16 @@ public:
     };
 
     /**
-     * @brief Construct a new ROS2Plugin object
+     * @brief Construct a new Ros2Plugin object
      *
      * @param config Configuration options for the plugin.
      */
-    explicit ROS2Plugin(const Config& config);
+    explicit Ros2Plugin(const Config& config);
 
     /**
-     * @brief Destroy the ROS2Plugin object.
+     * @brief Destroy the Ros2Plugin object.
      */
-    ~ROS2Plugin();
+    ~Ros2Plugin();
 
     /**
      * @brief Reset ROS 2 Plugin cleaning up all publishers and subscribers.
@@ -71,10 +71,10 @@ protected:
      * @brief Special member functions declared as default.
      */
     ///@{
-    ROS2Plugin(const ROS2Plugin&) = default;
-    ROS2Plugin(ROS2Plugin&&) = default;
-    ROS2Plugin& operator=(const ROS2Plugin&) = default;
-    ROS2Plugin& operator=(ROS2Plugin&&) = default;
+    Ros2Plugin(const Ros2Plugin&) = default;
+    Ros2Plugin(Ros2Plugin&&) = default;
+    Ros2Plugin& operator=(const Ros2Plugin&) = default;
+    Ros2Plugin& operator=(Ros2Plugin&&) = default;
     ///@}
 
 private:
@@ -95,6 +95,14 @@ private:
      * @brief Create ROS2 subscribers for actuator commands.
      */
     void create_actuator_subscribers(const mjModel* model);
+
+    /**
+     * @brief Plugin configuration attributes.
+     */
+    ///@{
+    static constexpr const char* attr_key_ros_namespace = "ros_namespace";
+    static constexpr const char* attr_key_topic_queue_size = "topic_queue_size";
+    ///@}
 
     /**
      * @brief Flag to check if the ROS 2 topics have been initialized.
