@@ -150,9 +150,8 @@ void Ros2Plugin::register_plugin() {
 
     plugin.init = +[](const mjModel* model, mjData* data, int instance) {
         if (not rclcpp::ok()) {
-            rclcpp::InitOptions options;
-            options.shutdown_on_signal = false;
-            rclcpp::init(0, nullptr, options);
+            rclcpp::init(0, nullptr);
+            rclcpp::uninstall_signal_handlers();
         }
 
         Config config = get_config_from_model(model, instance);
