@@ -149,7 +149,9 @@ void Ros2Plugin::register_plugin() {
 
     plugin.init = +[](const mjModel* model, mjData* data, int instance) {
         if (not rclcpp::ok()) {
-            rclcpp::init(0, nullptr);
+            rclcpp::InitOptions options;
+            options.shutdown_on_signal = false;
+            rclcpp::init(0, nullptr, options);
         }
 
         Config config = get_config_from_model(model, instance);
@@ -174,10 +176,6 @@ void Ros2Plugin::register_plugin() {
     };
 
     plugin.destroy = +[](mjData* data, int instance) {
-        if (rclcpp::ok()) {
-            rclcpp::shutdown();
-        }
-
         delete std::bit_cast<Ros2Plugin*>(data->plugin_data[instance]);
         data->plugin_data[instance] = 0;
     };
