@@ -1,0 +1,95 @@
+<mujoco>
+  <compiler autolimits="true"/>
+
+  <extension>
+    <plugin plugin="mujoco.ros2">
+      <instance name="micras"/>
+    </plugin>
+  </extension>
+
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .1 .1" rgb2=".2 .2 .2"/>
+    <material name="grid" texture="grid" texrepeat="5.5555555555 5.5555555555" texuniform="true" reflectance=".2"/>
+
+    <mesh name="base" scale="0.001 0.001 0.001"
+        vertex=" 31.0 -33.0 -0.5
+                 33.0  41.0 -0.5
+                 15.5  66.0 -0.5
+
+                -31.0 -33.0 -0.5
+                -33.0  41.0 -0.5
+                -15.5  66.0 -0.5
+
+                 31.0 -33.0  0.5
+                 33.0  41.0  0.5
+                 15.5  66.0  0.5
+
+                -31.0 -33.0  0.5
+                -33.0  41.0  0.5
+                -15.5  66.0  0.5
+    "/>
+  </asset>
+
+  <default>
+    <joint damping=".03" actuatorfrcrange="-0.5 0.5"/>
+    <default class="wheel">
+      <geom type="cylinder" size=".011 .004" rgba=".5 .5 1 1"/>
+    </default>
+    <default class="decor">
+      <site type="box" rgba=".5 1 .5 1"/>
+    </default>
+    <default class="dc_motor">
+        <general biastype="affine" gainprm="0.01 0 0" biasprm="0 0 -0.00001" gear="10"/>
+    </default>
+  </default>
+
+  <worldbody>
+    <geom type="plane" size="0 0 .01" pos="0 0 0" material="grid"/>
+    <light name="ambient_light" pos="0 0 3" dir="0 0 -1" directional="true" castshadow="false"/>
+
+    <body name="micras" pos="0.09 0.09 .03">
+      <freejoint/>
+
+      <site name="imu"/>
+      <site name="lidar_0" pos="-0.026 0.041 0.02" zaxis=" 0 1 0"/>
+      <site name="lidar_1" pos="-0.01  0.061 0.02" zaxis="-1 1 0"/>
+      <site name="lidar_2" pos=" 0.01  0.061 0.02" zaxis=" 1 1 0"/>
+      <site name="lidar_3" pos=" 0.026 0.041 0.02" zaxis=" 0 1 0"/>
+
+      <geom name="base" type="mesh" mesh="base" mass="0.1" rgba="0.0 0.4 0.2 1" contype="1" conaffinity="1"/>
+      <geom name="front wheel" pos="0.0 0.06 -0.0003" type="sphere" size=".001" condim="1" priority="1"/>
+
+      <body name="left wheel" pos="-0.031 0.0 0.01" zaxis="-1 0 0">
+        <joint name="left"/>
+        <geom class="wheel"/>
+        <site class="decor" size="0.01 0.001 0.0041"/>
+      </body>
+      <body name="right wheel" pos="0.031 0.0 0.01" zaxis="-1 0 0">
+        <joint name="right"/>
+        <geom class="wheel"/>
+        <site class="decor" size="0.01 0.001 0.0041"/>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <general name="left_motor" class="dc_motor" joint="left"/>
+    <general name="right_motor" class="dc_motor" joint="right"/>
+  </actuator>
+
+  <sensor>
+    <jointactuatorfrc name="right" joint="right"/>
+    <jointactuatorfrc name="left"  joint="left"/>
+
+    <gyro name="gyro" site="imu"/>
+    <accelerometer name="accelerometer" site="imu"/>
+
+    <jointpos name="left_encoder" joint="left"/>
+    <jointpos name="right_encoder" joint="right"/>
+
+    <rangefinder name="lidar_0" site="lidar_0"/>
+    <rangefinder name="lidar_1" site="lidar_1"/>
+    <rangefinder name="lidar_2" site="lidar_2"/>
+    <rangefinder name="lidar_3" site="lidar_3"/>
+  </sensor>
+</mujoco>
