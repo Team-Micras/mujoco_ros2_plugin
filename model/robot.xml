@@ -3,7 +3,10 @@
 
   <extension>
     <plugin plugin="mujoco.ros2">
-      <instance name="micras"/>
+      <instance name="micras">
+        <config key="ros_namespace" value="micras/"/>
+        <config key="topic_queue_size" value="10"/>
+      </instance>
     </plugin>
   </extension>
 
