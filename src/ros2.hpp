@@ -14,6 +14,7 @@ class ROS2Plugin {
 public:
     struct Config {
         std::string ros_namespace = "mujoco/";
+        int topic_queue_size = 1;
     };
 
     explicit ROS2Plugin(const Config& config);
@@ -45,6 +46,7 @@ private:
     void create_actuator_subscribers(const mjModel* m);
 
     std::string ros_namespace;
+    int topic_queue_size;
 
     rclcpp::Node::SharedPtr node;
 
