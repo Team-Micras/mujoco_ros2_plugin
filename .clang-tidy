@@ -11,6 +11,7 @@ Checks:
   -cppcoreguidelines-avoid-do-while,
   -cppcoreguidelines-narrowing-conversions,
   -cppcoreguidelines-pro-type-union-access,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   google-*,
   llvm-*,
   -llvm-header-guard,
@@ -25,6 +26,7 @@ Checks:
   -readability-duplicate-include,
   -readability-magic-numbers,
   -readability-math-missing-parentheses,
+  -readability-function-cognitive-complexity,
 HeaderFileExtensions:
   - ''
   - h

@@ -13,7 +13,7 @@ int read_int_attr(const char* value, int default_value) {
         return default_value;
     }
 
-    return std::strtol(value, nullptr, 10);
+    return static_cast<int>(std::strtol(value, nullptr, 10));
 }
 
 std::string read_string_attr(const char* value, const std::string& default_value) {
@@ -55,7 +55,7 @@ void ROS2Plugin::create_sensor_publishers(const mjModel* model) {
         const char*       sensor_name = model->names + model->name_sensoradr[i];
         const std::string topic_name = this->ros_namespace + "sensor/" + std::string(sensor_name);
 
-        int  pub_index;
+        int  pub_index = 0;
         int  num_dimensions = model->sensor_dim[i];
         auto sensor_datatype = static_cast<mjtDataType>(model->sensor_datatype[i]);
 
@@ -108,8 +108,8 @@ void ROS2Plugin::compute(const mjModel* model, mjData* data) {
     }
 
     for (const auto& sensor : this->sensors) {
-        int     num_dimensions = model->sensor_dim[sensor.object_index];
-        int     sensor_address = model->sensor_adr[sensor.object_index];
+        int     num_dimensions = model->sensor_dim[sensor.model_index];
+        int     sensor_address = model->sensor_adr[sensor.model_index];
         mjtNum* sensor_data = &data->sensordata[sensor_address];
 
         if (num_dimensions == 1) {
@@ -133,7 +133,7 @@ void ROS2Plugin::compute(const mjModel* model, mjData* data) {
         rclcpp::MessageInfo              info;
 
         if (this->actuator_subscribers[actuator.comm_index]->take(msg, info)) {
-            data->ctrl[actuator.object_index] = msg.data;
+            data->ctrl[actuator.model_index] = msg.data;
         }
     }
 }
@@ -159,7 +159,7 @@ void ROS2Plugin::register_plugin() {
         attr_key_topic_queue_size,
     };
 
-    plugin.nattribute = attributes.size();
+    plugin.nattribute = static_cast<int>(attributes.size());
     plugin.attributes = attributes.data();
     plugin.nstate = +[](const mjModel* /*model*/, int /*instance*/) { return 0; };
 

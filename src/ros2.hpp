@@ -66,13 +66,24 @@ public:
      */
     static Config get_config_from_model(const mjModel* model, int instance);
 
+protected:
+    /**
+     * @brief Special member functions declared as default.
+     */
+    ///@{
+    ROS2Plugin(const ROS2Plugin&) = default;
+    ROS2Plugin(ROS2Plugin&&) = default;
+    ROS2Plugin& operator=(const ROS2Plugin&) = default;
+    ROS2Plugin& operator=(ROS2Plugin&&) = default;
+    ///@}
+
 private:
     /**
      * @brief Data structure to hold index information for sensors and actuators.
      */
     struct IndexData {
-        int object_index;  // Index of the object in the Mujoco model
-        int comm_index;    // Index of the object in the publisher or subscriber array.
+        int model_index;  // Index of the object in the Mujoco model
+        int comm_index;   // Index of the object in the publisher or subscriber array.
     };
 
     /**
