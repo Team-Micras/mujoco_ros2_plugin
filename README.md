@@ -22,7 +22,7 @@ MuJoCo Plugin for integrating with ROS 2
 - [🛠 Prerequisites](#-prerequisites)
 - [⚙️ Installation](#️-installation)
   - [Building from Source](#building-from-source)
-  - [Setting up MuJoCo Plugin Path](#setting-up-mujoco-plugin-path)
+  - [Registering the plugin](#registering-the-plugin)
 - [▶️ Usage](#️-usage)
   - [Loading the Plugin in MJCF](#loading-the-plugin-in-mjcf)
   - [Plugin Configuration](#plugin-configuration)
@@ -70,8 +70,6 @@ Ensure the following are installed and configured on your system:
 - **Build Tools**:
   - `cmake` (version 3.16+)
   - C++20 compliant compiler (e.g., GCC, Clang)
-
----
 
 ## ⚙️ Installation
 
@@ -144,8 +142,6 @@ Configure the plugin directly within the MJCF `<plugin>` tag:
   <config key="topic_queue_size" value="5"/>
   ```
 
----
-
 ## 🔄 ROS 2 Interface
 
 The plugin establishes the following ROS 2 communication channels:
@@ -172,8 +168,6 @@ Commands for actuators defined in the `<actuator>` section of your MJCF can be s
   - The `data` field of the message is applied to `mjData->ctrl[]` for the respective actuator.
 
 Where `<actuator_name>` is the `name` attribute from the MJCF.
-
----
 
 ## 💡 Example
 
