@@ -24,13 +24,13 @@ std::string read_string_attr(const char* value, const std::string& default_value
 Ros2Plugin::Config Ros2Plugin::get_config_from_model(const mjModel* model, int instance) {
     Config config;
     config.ros_namespace = read_string_attr(mj_getPluginConfig(model, instance, attr_key_ros_namespace), "mujoco/");
-    config.node_name = model->names + model->name_pluginadr[instance];
+    config.node_name = "mujoco_" + std::to_string(instance);
     config.topic_queue_size = read_int_attr(mj_getPluginConfig(model, instance, attr_key_topic_queue_size), 1);
     return config;
 }
 
 Ros2Plugin::Ros2Plugin(const Config& config) :
-    Node(config.node_name, "mujoco/"), ros_namespace(config.ros_namespace), topic_queue_size(config.topic_queue_size) {
+    Node(config.node_name), ros_namespace(config.ros_namespace), topic_queue_size(config.topic_queue_size) {
     RCLCPP_INFO(this->get_logger(), "ROS2 Mujoco Plugin node started");
 }
 
