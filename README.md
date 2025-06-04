@@ -1,7 +1,7 @@
 <!-- markdownlint-disable -->
 <div align="center">
 
-![micras_mujoco_ros_plugin](https://github.com/user-attachments/assets/bc836e9b-fbb2-450f-8c56-2a33d2e1c9a2)
+![micras_mujoco_ros2_plugin](https://github.com/user-attachments/assets/bc836e9b-fbb2-450f-8c56-2a33d2e1c9a2)
 
 MuJoCo Plugin for integrating with ROS 2
 
@@ -97,7 +97,7 @@ Ensure the following are installed and configured on your system:
    cmake --install build
    ```
 
-   This command installs the plugin (e.g., `libros_plugin.so`) to `${MUJOCO_PATH}/mujoco_plugin/`. This path is typically searched by MuJoCo by default.
+   This command installs the plugin (e.g., `libros2_plugin.so`) to `${MUJOCO_PATH}/mujoco_plugin/`. This path is typically searched by MuJoCo by default.
 
 ### Setting up MuJoCo Plugin Path
 

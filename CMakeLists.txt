@@ -29,17 +29,17 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(example_interfaces REQUIRED)
 
-add_library(ros_plugin SHARED)
-target_sources(ros_plugin PRIVATE "src/ros2_plugin.cpp" "src/register.cpp")
-target_include_directories(ros_plugin PRIVATE "${MUJOCO_PATH}/../include")
+add_library(ros2_plugin SHARED)
+target_sources(ros2_plugin PRIVATE "src/ros2_plugin.cpp" "src/register.cpp")
+target_include_directories(ros2_plugin PRIVATE "${MUJOCO_PATH}/../include")
 
-target_link_libraries(ros_plugin mujoco)
-ament_target_dependencies(ros_plugin
+target_link_libraries(ros2_plugin mujoco)
+ament_target_dependencies(ros2_plugin
     rclcpp
     example_interfaces
 )
 
-install(TARGETS ros_plugin
-    EXPORT export_ros_plugin
+install(TARGETS ros2_plugin
+    EXPORT export_ros2_plugin
     LIBRARY DESTINATION ${MUJOCO_PATH}/mujoco_plugin
 )
