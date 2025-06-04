@@ -10,7 +10,7 @@
 namespace mujoco::plugin::ros2 {
 
 /**
- * @brief ROS 2 Plugin for Mujoco to handle sensor data publishing and actuator command subscribing.
+ * @brief ROS2 Plugin for Mujoco to handle sensor data publishing and actuator command subscribing.
  *
  * This plugin allows Mujoco to communicate with ROS2 by publishing sensor data
  * and subscribing to actuator commands.
@@ -34,7 +34,7 @@ public:
     explicit Ros2Plugin(const Config& config);
 
     /**
-     * @brief Reset ROS 2 Plugin cleaning up all publishers and subscribers.
+     * @brief Reset ROS2 Plugin cleaning up all publishers and subscribers.
      */
     void reset();
 
@@ -90,17 +90,17 @@ private:
     ///@}
 
     /**
-     * @brief Flag to check if the ROS 2 topics have been initialized.
+     * @brief Flag to check if the ROS2 topics have been initialized.
      */
     bool initialized = false;
 
     /**
-     * @brief ROS 2 namespace for the simulation topics.
+     * @brief ROS2 namespace for the simulation topics.
      */
     std::string ros_namespace;
 
     /**
-     * @brief Queue size for ROS 2 topics.
+     * @brief Queue size for ROS2 topics.
      */
     int topic_queue_size;
 

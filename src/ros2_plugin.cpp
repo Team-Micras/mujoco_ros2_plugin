@@ -57,8 +57,7 @@ void Ros2Plugin::create_sensor_publishers(const mjModel* model) {
         }
 
         RCLCPP_INFO(
-            this->get_logger(), "Created publisher for sensor '%s' of type %d with data type %d on topic '%s'",
-            sensor_name, model->sensor_type[i], sensor_datatype, topic_name.c_str()
+            this->get_logger(), "Created publisher for sensor '%s' on topic '%s'", sensor_name, topic_name.c_str()
         );
 
         this->sensors.push_back({i, pub_index});
@@ -66,6 +65,8 @@ void Ros2Plugin::create_sensor_publishers(const mjModel* model) {
 }
 
 void Ros2Plugin::create_actuator_subscribers(const mjModel* model) {
+    RCLCPP_INFO(this->get_logger(), "Creating actuator subscribers for %d actuators", model->nu);
+
     for (int i = 0; i < model->nu; i++) {
         const char* actuator_name = model->names + model->name_actuatoradr[i];
         std::string topic_name = this->ros_namespace + "actuators/" + actuator_name + "/command";
@@ -123,7 +124,7 @@ void Ros2Plugin::compute(const mjModel* model, mjData* data) {
 }
 
 void Ros2Plugin::reset() {
-    RCLCPP_INFO(this->get_logger(), "Resetting ROS2 Plugin state from instance");
+    RCLCPP_INFO(this->get_logger(), "Resetting ROS2 Plugin state");
     this->initialized = false;
     this->sensors.clear();
     this->actuators.clear();
