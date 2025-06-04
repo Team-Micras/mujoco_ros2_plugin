@@ -9,7 +9,7 @@ MuJoCo Plugin for integrating with ROS 2
 
 <p align="center">
 <a href="https://docs.ros.org/en/jazzy/index.html"><img alt="ROS Jazzy" src="https://img.shields.io/badge/ROS_version-jazzy-green?style=for-the-badge&labelColor=2e8b57&color=228b22" height="30"></a>
-<a href="https://gazebosim.org/docs/harmonic"><img alt="MuJoCo" src="https://img.shields.io/badge/MuJoCo_version-3.3.2-blue?style=for-the-badge&labelColor=4169e1&color=1e90ff" height="30"></a>
+<a href="https://mujoco.org/"><img alt="MuJoCo" src="https://img.shields.io/badge/MuJoCo_version-3.3.2-blue?style=for-the-badge&labelColor=4169e1&color=1e90ff" height="30"></a>
 <a href="https://cplusplus.com/"><img alt="Made with C++" src="https://img.shields.io/badge/made_with-c%2B%2B-blue?style=for-the-badge&labelColor=ef4041&color=c1282d" height="30"></a>
 
 <!-- markdownlint-restore -->
@@ -102,7 +102,7 @@ Ensure the following are installed and configured on your system:
 MuJoCo needs to register the plugin for every simulation, the installation step usually places it in a standard location so that it can be automatically registered. If you install it elsewhere, or MuJoCo cannot find it, you might need to:
 
 - **Option 1:** Move the library output file manually to the `mujoco_plugin` folder located at the same directory as the mujoco executable.
-- **Option 2:**: Register the plugin manually by calling the `ROS2Plugin::register_plugin()` function before the mujoco simulate loop.
+- **Option 2:**: Register the plugin manually by calling the `Ros2Plugin::register_plugin()` function before the mujoco simulate loop.
 
 ## ▶️ Usage
 
