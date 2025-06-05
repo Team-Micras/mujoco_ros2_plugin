@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <bit>
 #include <mujoco/mjplugin.h>
 #include <mujoco/mujoco.h>
@@ -109,11 +110,7 @@ void Ros2Plugin::compute(const mjModel* model, mjData* data) {
         } else {
             example_interfaces::msg::Float64MultiArray msg;
             msg.data.resize(num_dimensions);
-
-            for (int j = 0; j < num_dimensions; j++) {
-                msg.data[j] = sensor_data[j];
-            }
-
+            std::copy(sensor_data, sensor_data + num_dimensions, msg.data.begin());
             this->multiarray_sensor_publishers[sensor.comm_index]->publish(msg);
         }
     }
