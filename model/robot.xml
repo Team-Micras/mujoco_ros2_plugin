@@ -1,11 +1,11 @@
 <mujoco>
-  <compiler autolimits="true"/>
+  <option timestep="0.0005" integrator="implicitfast" cone="elliptic"/>
 
   <extension>
     <plugin plugin="mujoco.ros2">
       <instance name="micras">
         <config key="ros_namespace" value="micras/"/>
-        <config key="topic_queue_size" value="10"/>
+        <config key="topic_queue_size" value="1"/>
       </instance>
     </plugin>
   </extension>
@@ -34,24 +34,27 @@
   </asset>
 
   <default>
-    <joint damping=".03" actuatorfrcrange="-0.5 0.5"/>
     <default class="wheel">
+      <joint type="hinge" frictionloss="0.000645"/>
       <geom type="cylinder" size=".011 .004" rgba=".5 .5 1 1"/>
-    </default>
-    <default class="decor">
-      <site type="box" rgba=".5 1 .5 1"/>
+      <site type="box" rgba=".5 1 .5 1" size="0.01 0.001 0.0041"/>
+      <pair friction="1 1 0.005 0.0001 0.0001"/>
     </default>
     <default class="dc_motor">
-        <general biastype="affine" gainprm="0.01 0 0" biasprm="0 0 -0.00001" gear="10"/>
+        <general biastype="affine" gainprm="0.0106 0 0" biasprm="0 0 -0.0000115" gear="10"/>
     </default>
   </default>
 
   <worldbody>
-    <geom type="plane" size="0 0 .01" pos="0 0 0" material="grid"/>
+    <geom name="floor" type="plane" size="0 0 .01" pos="0 0 0" material="grid"/>
     <light name="ambient_light" pos="0 0 3" dir="0 0 -1" directional="true" castshadow="false"/>
 
     <body name="micras" pos="0.09 0.09 .03">
       <freejoint/>
+
+      <camera name="overhead_camera" mode="track" pos="0 0 0.5" euler="0 0 0" fovy="60"/>
+      <camera name="side_tracking_camera" pos="-0.4 -0.4 0.643" mode="track" xyaxes="0.70 -0.70 -0.000 0.471 0.481 0.739"/>
+      <camera name="robot_pov" mode="fixed" pos="0 0.04 0.03" euler="90 0 0" fovy="80"/>
 
       <site name="imu"/>
       <site name="lidar_0" pos="-0.026 0.041 0.02" zaxis=" 0 1 0"/>
@@ -59,36 +62,41 @@
       <site name="lidar_2" pos=" 0.01  0.061 0.02" zaxis=" 1 1 0"/>
       <site name="lidar_3" pos=" 0.026 0.041 0.02" zaxis=" 0 1 0"/>
 
-      <geom name="base" type="mesh" mesh="base" mass="0.1" rgba="0.0 0.4 0.2 1" contype="1" conaffinity="1"/>
+      <geom name="base" type="mesh" mesh="base" mass="0.08" rgba="0.0 0.4 0.2 1" contype="1" conaffinity="1"/>
       <geom name="front wheel" pos="0.0 0.06 -0.0003" type="sphere" size=".001" condim="1" priority="1"/>
 
-      <body name="left wheel" pos="-0.031 0.0 0.01" zaxis="-1 0 0">
-        <joint name="left"/>
-        <geom class="wheel"/>
-        <site class="decor" size="0.01 0.001 0.0041"/>
+      <body name="left_wheel" pos="-0.031 0.0 0.01" zaxis="-1 0 0">
+        <joint name="left_wheel" class="wheel"/>
+        <geom name="left_wheel" class="wheel"/>
+        <site class="wheel"/>
       </body>
-      <body name="right wheel" pos="0.031 0.0 0.01" zaxis="-1 0 0">
-        <joint name="right"/>
-        <geom class="wheel"/>
-        <site class="decor" size="0.01 0.001 0.0041"/>
+      <body name="right_wheel" pos="0.031 0.0 0.01" zaxis="-1 0 0">
+        <joint name="right_wheel" class="wheel"/>
+        <geom name="right_wheel" class="wheel"/>
+        <site class="wheel"/>
       </body>
     </body>
   </worldbody>
 
+  <contact>
+    <pair class="wheel" geom1="left_wheel" geom2="floor"/>
+    <pair class="wheel" geom1="right_wheel" geom2="floor"/>
+  </contact>
+
   <actuator>
-    <general name="left_motor" class="dc_motor" joint="left"/>
-    <general name="right_motor" class="dc_motor" joint="right"/>
+    <general name="left_motor" class="dc_motor" joint="left_wheel"/>
+    <general name="right_motor" class="dc_motor" joint="right_wheel"/>
   </actuator>
 
   <sensor>
-    <jointactuatorfrc name="right" joint="right"/>
-    <jointactuatorfrc name="left"  joint="left"/>
+    <jointactuatorfrc name="left_torque"  joint="left_wheel"/>
+    <jointactuatorfrc name="right_torque" joint="right_wheel"/>
 
     <gyro name="gyro" site="imu"/>
     <accelerometer name="accelerometer" site="imu"/>
 
-    <jointpos name="left_encoder" joint="left"/>
-    <jointpos name="right_encoder" joint="right"/>
+    <jointpos name="left_encoder" joint="left_wheel"/>
+    <jointpos name="right_encoder" joint="right_wheel"/>
 
     <rangefinder name="lidar_0" site="lidar_0"/>
     <rangefinder name="lidar_1" site="lidar_1"/>
