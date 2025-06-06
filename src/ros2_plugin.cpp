@@ -153,6 +153,7 @@ void Ros2Plugin::register_plugin() {
     std::vector<const char*> attributes = {
         attr_key_ros_namespace,
         attr_key_topic_queue_size,
+        attr_key_topic_reliability,
     };
 
     plugin.nattribute = static_cast<int>(attributes.size());
