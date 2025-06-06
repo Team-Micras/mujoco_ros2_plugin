@@ -21,9 +21,10 @@ public:
      * @brief Configuration options for the ROS2 plugin.
      */
     struct Config {
-        std::string node_name;         // Name for the plugin ROS2 node
-        std::string ros_namespace;     // Namespace for ROS2 topics
-        int         topic_queue_size;  // Queue size for ROS2 topics
+        std::string node_name;          // Name for the plugin ROS2 node
+        std::string ros_namespace;      // Namespace for ROS2 topics
+        int         topic_queue_size;   // Queue size for ROS2 topics
+        std::string topic_reliability;  // Reliability policy of the ROS2 topics
     };
 
     /**
@@ -96,6 +97,11 @@ private:
     static constexpr const char* attr_key_topic_queue_size = "topic_queue_size";
 
     /**
+     * @brief Topic reliability attribute key.
+     */
+    static constexpr const char* attr_key_topic_reliability = "topic_reliability";
+
+    /**
      * @brief ROS namespace attribute default value.
      */
     static constexpr const char* attr_default_ros_namespace = "mujoco/";
@@ -104,6 +110,11 @@ private:
      * @brief Topic queue size attribute default value.
      */
     static constexpr int attr_default_topic_queue_size = 1;
+
+    /**
+     * @brief Topic reliability attribute default value.
+     */
+    static constexpr const char* attr_default_topic_reliability = "best_effort";
 
     /**
      * @brief Flag to check if the ROS2 topics have been initialized.
@@ -116,9 +127,9 @@ private:
     std::string ros_namespace;
 
     /**
-     * @brief Queue size for ROS2 topics.
+     * @brief Quality of service settings for ROS2 topics.
      */
-    int topic_queue_size;
+    rclcpp::QoS qos;
 
     /**
      * @brief Array to hold sensors indexes.

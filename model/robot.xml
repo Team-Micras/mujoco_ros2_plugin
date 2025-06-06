@@ -3,9 +3,10 @@
 
   <extension>
     <plugin plugin="mujoco.ros2">
-      <instance name="micras">
-        <config key="ros_namespace" value="micras/"/>
+      <instance name="ros2_plugin">
+        <config key="ros_namespace" value="mujoco/"/>
         <config key="topic_queue_size" value="1"/>
+        <config key="topic_reliability" value="best_effort"/>
       </instance>
     </plugin>
   </extension>
@@ -36,9 +37,8 @@
   <default>
     <default class="wheel">
       <joint type="hinge" frictionloss="0.000645"/>
-      <geom type="cylinder" size=".011 .004" rgba=".5 .5 1 1"/>
+      <geom type="cylinder" size=".011 .004" rgba=".5 .5 1 1" condim="6" friction="0.95 0.004 0.001" priority="1"/>
       <site type="box" rgba=".5 1 .5 1" size="0.01 0.001 0.0041"/>
-      <pair friction="1 1 0.005 0.0001 0.0001"/>
     </default>
     <default class="dc_motor">
         <general biastype="affine" gainprm="0.0106 0 0" biasprm="0 0 -0.0000115" gear="10"/>
@@ -63,7 +63,7 @@
       <site name="lidar_3" pos=" 0.026 0.041 0.02" zaxis=" 0 1 0"/>
 
       <geom name="base" type="mesh" mesh="base" mass="0.08" rgba="0.0 0.4 0.2 1" contype="1" conaffinity="1"/>
-      <geom name="front wheel" pos="0.0 0.06 -0.0003" type="sphere" size=".001" condim="1" priority="1"/>
+      <geom name="front wheel" pos="0.0 0.06 -0.0003" type="sphere" size=".001" friction="0.05" priority="1"/>
 
       <body name="left_wheel" pos="-0.031 0.0 0.01" zaxis="-1 0 0">
         <joint name="left_wheel" class="wheel"/>
@@ -77,11 +77,6 @@
       </body>
     </body>
   </worldbody>
-
-  <contact>
-    <pair class="wheel" geom1="left_wheel" geom2="floor"/>
-    <pair class="wheel" geom1="right_wheel" geom2="floor"/>
-  </contact>
 
   <actuator>
     <general name="left_motor" class="dc_motor" joint="left_wheel"/>

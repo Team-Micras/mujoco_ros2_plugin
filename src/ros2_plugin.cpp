@@ -32,11 +32,21 @@ Ros2Plugin::Config Ros2Plugin::get_config_from_model(const mjModel* model, int i
     config.topic_queue_size =
         read_int_attr(mj_getPluginConfig(model, instance, attr_key_topic_queue_size), attr_default_topic_queue_size);
 
+    config.topic_reliability = read_string_attr(
+        mj_getPluginConfig(model, instance, attr_key_topic_reliability), attr_default_topic_reliability
+    );
+
     return config;
 }
 
 Ros2Plugin::Ros2Plugin(const Config& config) :
-    Node(config.node_name), ros_namespace(config.ros_namespace), topic_queue_size(config.topic_queue_size) {
+    Node{config.node_name}, ros_namespace{config.ros_namespace}, qos{rclcpp::KeepLast(config.topic_queue_size)} {
+    if (config.topic_reliability == "reliable") {
+        this->qos = this->qos.reliable();
+    } else {
+        this->qos = this->qos.best_effort();
+    }
+
     RCLCPP_INFO(this->get_logger(), "ROS2 Mujoco Plugin node started");
 }
 
@@ -52,12 +62,11 @@ void Ros2Plugin::create_sensor_publishers(const mjModel* model) {
         auto sensor_datatype = static_cast<mjtDataType>(model->sensor_datatype[i]);
 
         if (num_dimensions == 1) {
-            auto pub = this->create_publisher<example_interfaces::msg::Float64>(topic_name, this->topic_queue_size);
+            auto pub = this->create_publisher<example_interfaces::msg::Float64>(topic_name, this->qos);
             double_sensor_publishers.push_back(pub);
             pub_index = static_cast<int>(double_sensor_publishers.size() - 1);
         } else {
-            auto pub =
-                this->create_publisher<example_interfaces::msg::Float64MultiArray>(topic_name, this->topic_queue_size);
+            auto pub = this->create_publisher<example_interfaces::msg::Float64MultiArray>(topic_name, this->qos);
             multiarray_sensor_publishers.push_back(pub);
             pub_index = static_cast<int>(multiarray_sensor_publishers.size() - 1);
         }
@@ -79,7 +88,7 @@ void Ros2Plugin::create_actuator_subscribers(const mjModel* model) {
 
         auto sub = this->create_subscription<example_interfaces::msg::Float64>(
             // NOLINTNEXTLINE(performance-unnecessary-value-param)
-            topic_name, this->topic_queue_size, [](const example_interfaces::msg::Float64::SharedPtr /*msg*/) {}
+            topic_name, this->qos, [](const example_interfaces::msg::Float64::SharedPtr /*msg*/) {}
         );
 
         actuator_subscribers.push_back(sub);
