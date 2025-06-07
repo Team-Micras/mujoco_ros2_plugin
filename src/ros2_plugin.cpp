@@ -55,7 +55,7 @@ void Ros2Plugin::create_sensor_publishers(const mjModel* model) {
 
     for (int i = 0; i < model->nsensor; i++) {
         const char*       sensor_name = model->names + model->name_sensoradr[i];
-        const std::string topic_name = this->ros_namespace + "sensor/" + std::string(sensor_name);
+        const std::string topic_name = this->ros_namespace + "sensors/" + std::string(sensor_name);
 
         int  pub_index = 0;
         int  num_dimensions = model->sensor_dim[i];

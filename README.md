@@ -114,9 +114,12 @@ To activate the plugin, add an `<extension>` block to your MJCF model file. The 
 <mujoco>
     <extension>
         <plugin plugin="mujoco.ros2">
-            <!-- Optional: Configuration parameters -->
-            <!-- <config key="ros_namespace" value="my_robot/"/> -->
-            <!-- <config key="topic_queue_size" value="10"/> -->
+            <instance name="ros2_plugin">
+                <!-- Optional: Configuration parameters -->
+                <!-- <config key="ros_namespace" value="mujoco/"/> -->
+                <!-- <config key="topic_queue_size" value="1"/> -->
+                <!-- <config key="topic_reliability" value="best_effort"/> -->
+            </instance>
         </plugin>
     </extension>
 
@@ -142,6 +145,13 @@ Configure the plugin directly within the MJCF `<plugin>` tag:
   <config key="topic_queue_size" value="5"/>
   ```
 
+- **`topic_reliability`** (integer, default: `1`):
+  Sets the reliability of the ROS topic QoS.
+
+  ```xml
+  <config key="topic_reliability" value="best_effort"/>
+  ```
+
 ## 🔄 ROS 2 Interface
 
 The plugin establishes the following ROS 2 communication channels:
@@ -151,10 +161,10 @@ The plugin establishes the following ROS 2 communication channels:
 Data from sensors defined in the `<sensor>` section of your MJCF will be published.
 
 - **Single-Dimension Sensors**:
-  - Topic: `<ros_namespace>sensor/<sensor_name>`
+  - Topic: `<ros_namespace>sensors/<sensor_name>`
   - Type: `example_interfaces::msg::Float64`
 - **Multi-Dimension Sensors**:
-  - Topic: `<ros_namespace>sensor/<sensor_name>`
+  - Topic: `<ros_namespace>sensors/<sensor_name>`
   - Type: `example_interfaces::msg::Float64MultiArray`
 
 Where `<sensor_name>` is the `name` attribute from the MJCF.
@@ -171,54 +181,86 @@ Where `<actuator_name>` is the `name` attribute from the MJCF.
 
 ## 💡 Example
 
-Consider this MJCF snippet for a simple arm:
+Consider this MJCF snippet for a simple car:
 
 ```xml
-<mujoco model="simple_arm_example">
-    <compiler angle="radian"/>
-
-    <extension>
-        <plugin plugin="mujoco.ros2">
-            <config key="ros_namespace" value="simple_arm/"/>
-            <config key="topic_queue_size" value="10"/>
-        </plugin>
+<mujoco>
+  <extension>
+      <plugin plugin="mujoco.ros2">
+        <instance name="ros2_plugin">
+          <config key="ros_namespace" value="simple_car/"/>
+        </instance>
+      </plugin>
     </extension>
 
-    <worldbody>
-        <!-- ... robot definition ... -->
-        <body name="arm_base">
-            <joint name="joint1" type="hinge" axis="0 0 1"/>
-            <!-- ... more links and joints ... -->
-        </body>
-    </worldbody>
+  <asset>
+    <mesh name="chasis" scale=".01 .006 .0015"
+      vertex=" 9   2   0
+              -10  10  10
+               9  -2   0
+               10  3  -10
+               10 -3  -10
+              -8   10 -10
+              -10 -10  10
+              -8  -10 -10
+              -5   0   20"/>
+  </asset>
 
-    <sensor>
-        <jointpos name="joint1_pos" joint="joint1"/>
-        <user name="my_custom_sensor" dim="3" /> <!-- Example user sensor -->
-    </sensor>
+  <default>
+    <joint damping=".03" actuatorfrcrange="-0.5 0.5"/>
+    <default class="wheel">
+      <geom type="cylinder" size=".03 .01" rgba=".5 .5 1 1"/>
+    </default>
+  </default>
 
-    <actuator>
-        <motor name="motor1" joint="joint1" gear="100"/>
-    </actuator>
+  <worldbody>
+    <geom type="plane" size="3 3 .01"/>
+
+    <body name="car" pos="0 0 .03">
+      <freejoint/>
+      <geom name="chasis" type="mesh" mesh="chasis"/>
+      <geom name="front wheel" pos=".08 0 -.015" type="sphere" size=".015" condim="1" priority="1"/>
+      <body name="left wheel" pos="-.07 .06 0" zaxis="0 1 0">
+        <joint name="left_wheel"/>
+        <geom class="wheel"/>
+      </body>
+      <body name="right_wheel" pos="-.07 -.06 0" zaxis="0 1 0">
+        <joint name="right_wheel"/>
+        <geom class="wheel"/>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <motor name="left_motor" joint="left_wheel" ctrlrange="-1 1"/>
+    <motor name="right_motor" joint="right_wheel" ctrlrange="-1 1"/>
+  </actuator>
+
+  <sensor>
+    <jointactuatorfrc name="left_torque" joint="left_wheel"/>
+    <jointactuatorfrc name="right_torque" joint="right_wheel"/>
+  </sensor>
 </mujoco>
+
 ```
 
 **This would result in:**
 
 - **Publishers**:
-  - `/simple_arm/sensor/joint1_pos` (`Float64`)
-  - `/simple_arm/sensor/my_custom_sensor` (`Float64MultiArray`)
+  - `/simple_car/sensors/left_torque` (`Float64`)
+  - `/simple_car/sensors/right_torque` (`Float64`)
 - **Subscribers**:
-  - `/simple_arm/actuators/motor1/command` (`Float64`)
+  - `/simple_car/actuators/left_motor/command` (`Float64`)
+  - `/simple_car/actuators/right_motor/command` (`Float64`)
 
 Interact using ROS 2 tools:
 
 ```bash
 # Listen to a sensor
-ros2 topic echo /simple_arm/sensor/joint1_pos
+ros2 topic echo /simple_car/sensors/left_torque
 
 # Send a command to an actuator
-ros2 topic pub /simple_arm/actuators/motor1/command example_interfaces/msg/Float64 '{data: 0.5}' --once
+ros2 topic pub /simple_car/actuators/right_motor/command example_interfaces/msg/Float64 '{data: 0.5}' --once
 ```
 
 ## 👥 Contributing
