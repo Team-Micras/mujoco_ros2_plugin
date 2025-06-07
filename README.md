@@ -8,9 +8,9 @@ MuJoCo Plugin for integrating with ROS 2
 </div>
 
 <p align="center">
-<a href="https://docs.ros.org/en/jazzy/index.html"><img alt="ROS Jazzy" src="https://img.shields.io/badge/ROS_version-jazzy-green?style=for-the-badge&labelColor=2e8b57&color=228b22" height="30"></a>
-<a href="https://mujoco.org/"><img alt="MuJoCo" src="https://img.shields.io/badge/MuJoCo_version-3.3.2-blue?style=for-the-badge&labelColor=4169e1&color=1e90ff" height="30"></a>
 <a href="https://cplusplus.com/"><img alt="Made with C++" src="https://img.shields.io/badge/made_with-c%2B%2B-blue?style=for-the-badge&labelColor=ef4041&color=c1282d" height="30"></a>
+<a href="https://docs.ros.org/en/jazzy/index.html"><img alt="ROS Jazzy" src="https://img.shields.io/badge/ROS_version-jazzy-green?style=for-the-badge&labelColor=2e8b57&color=228b22" height="30"></a>
+<a href="https://mujoco.org/"><img alt="MuJoCo" src="https://img.shields.io/badge/built_for-MuJoCo-blue?style=for-the-badge&labelColor=4169e1&color=1e90ff" height="30"></a>
 
 <!-- markdownlint-restore -->
 
