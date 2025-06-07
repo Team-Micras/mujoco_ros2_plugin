@@ -41,6 +41,16 @@ MuJoCo Plugin for integrating with ROS 2
 
 This plugin acts as a bridge, allowing sensor data to flow from MuJoCo to ROS 2, and actuator commands from ROS 2 back into your MuJoCo simulation. It's designed to be straightforward to use and configure, facilitating rapid development and testing of robotic systems.
 
+<!-- markdownlint-disable -->
+<div align="center">
+
+![mujoco_ros2_plugin](https://github.com/user-attachments/assets/b4f3b565-e612-43b9-949b-438f973df0df)
+
+Mujoco ROS 2 topics plotted on [PlotJuggler](https://github.com/facontidavide/PlotJuggler)
+
+</div>
+<!-- markdownlint-restore -->
+
 ## 🚀 Features
 
 - **ROS 2 Node Integration**: Automatically initializes and manages a dedicated ROS 2 node (`mujoco_ros2_plugin`).
