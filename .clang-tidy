@@ -1,0 +1,52 @@
+---
+Checks:
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-dynamic-static-initializers,
+  -bugprone-bitwise-pointer-cast,
+  clang-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-avoid-do-while,
+  -cppcoreguidelines-narrowing-conversions,
+  -cppcoreguidelines-pro-type-union-access,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-owning-memory,
+  google-*,
+  llvm-*,
+  -llvm-header-guard,
+  misc-*,
+  -misc-include-cleaner,
+  -misc-use-anonymous-namespace,
+  modernize-*,
+  -modernize-use-nodiscard,
+  -modernize-use-trailing-return-type,
+  performance-*,
+  readability-*,
+  -readability-duplicate-include,
+  -readability-magic-numbers,
+  -readability-math-missing-parentheses,
+  -readability-function-cognitive-complexity,
+HeaderFileExtensions:
+  - ''
+  - h
+  - hh
+  - hpp
+  - hxx
+ImplementationFileExtensions:
+  - c
+  - cc
+  - cpp
+  - cxx
+HeaderFilterRegex: '(include|config)/.*.hpp'
+FormatStyle: none
+CheckOptions:
+  readability-identifier-length.MinimumVariableNameLength: 2
+  readability-identifier-length.IgnoredVariableNames: ^[nxyz]$
+  readability-identifier-length.MinimumParameterNameLength: 2
+  readability-identifier-length.IgnoredParameterNames: ^[nxyz]$
+  misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic: true
+  bugprone-narrowing-conversions.WarnOnIntegerToFloatingPointNarrowingConversion: false
+SystemHeaders: false
+...
