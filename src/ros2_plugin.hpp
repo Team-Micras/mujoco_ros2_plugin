@@ -114,7 +114,7 @@ private:
     /**
      * @brief Topic reliability attribute default value.
      */
-    static constexpr const char* attr_default_topic_reliability = "best_effort";
+    static constexpr const char* attr_default_topic_reliability = "reliable";
 
     /**
      * @brief Flag to check if the ROS2 topics have been initialized.

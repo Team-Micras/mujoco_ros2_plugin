@@ -41,10 +41,10 @@ Ros2Plugin::Config Ros2Plugin::get_config_from_model(const mjModel* model, int i
 
 Ros2Plugin::Ros2Plugin(const Config& config) :
     Node{config.node_name}, ros_namespace{config.ros_namespace}, qos{rclcpp::KeepLast(config.topic_queue_size)} {
-    if (config.topic_reliability == "reliable") {
-        this->qos = this->qos.reliable();
-    } else {
+    if (config.topic_reliability == "best_effort") {
         this->qos = this->qos.best_effort();
+    } else {
+        this->qos = this->qos.reliable();
     }
 
     RCLCPP_INFO(this->get_logger(), "ROS2 Mujoco Plugin node started");
@@ -118,6 +118,9 @@ void Ros2Plugin::compute(const mjModel* model, mjData* data) {
             this->double_sensor_publishers[sensor.comm_index]->publish(msg);
         } else {
             example_interfaces::msg::Float64MultiArray msg;
+            msg.layout.dim.resize(1);
+            msg.layout.dim[0].size = num_dimensions;
+            msg.layout.dim[0].stride = num_dimensions;
             msg.data.resize(num_dimensions);
             std::copy(sensor_data, sensor_data + num_dimensions, msg.data.begin());
             this->multiarray_sensor_publishers[sensor.comm_index]->publish(msg);

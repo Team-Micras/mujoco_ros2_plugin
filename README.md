@@ -118,7 +118,7 @@ To activate the plugin, add an `<extension>` block to your MJCF model file. The 
                 <!-- Optional: Configuration parameters -->
                 <!-- <config key="ros_namespace" value="mujoco/"/> -->
                 <!-- <config key="topic_queue_size" value="1"/> -->
-                <!-- <config key="topic_reliability" value="best_effort"/> -->
+                <!-- <config key="topic_reliability" value="reliable"/> -->
             </instance>
         </plugin>
     </extension>
@@ -145,7 +145,7 @@ Configure the plugin directly within the MJCF `<plugin>` tag:
   <config key="topic_queue_size" value="5"/>
   ```
 
-- **`topic_reliability`** (integer, default: `1`):
+- **`topic_reliability`** (string, default: `reliable`):
   Sets the reliability of the ROS topic QoS.
 
   ```xml
