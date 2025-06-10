@@ -28,6 +28,7 @@ link_directories("${MUJOCO_LIB}/lib")
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(example_interfaces REQUIRED)
+find_package(builtin_interfaces REQUIRED)
 
 add_library(ros2_plugin SHARED)
 target_sources(ros2_plugin PRIVATE "src/ros2_plugin.cpp" "src/register.cpp")
@@ -37,6 +38,7 @@ target_link_libraries(ros2_plugin mujoco)
 ament_target_dependencies(ros2_plugin
     rclcpp
     example_interfaces
+    builtin_interfaces
 )
 
 install(TARGETS ros2_plugin
