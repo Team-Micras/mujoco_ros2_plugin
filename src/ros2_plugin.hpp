@@ -3,6 +3,7 @@
 
 #include <example_interfaces/msg/float64.hpp>
 #include <example_interfaces/msg/float64_multi_array.hpp>
+#include <builtin_interfaces/msg/time.hpp>
 #include <mujoco/mjdata.h>
 #include <mujoco/mjmodel.h>
 #include <rclcpp/rclcpp.hpp>
@@ -150,6 +151,11 @@ private:
      * @brief Publishers for sensor data of multi-array type.
      */
     std::vector<rclcpp::Publisher<example_interfaces::msg::Float64MultiArray>::SharedPtr> multiarray_sensor_publishers;
+
+    /**
+     * @brief Publisher for the MuJoCo clock time.
+     */
+    rclcpp::Publisher<builtin_interfaces::msg::Time>::SharedPtr clock_publisher;
 
     /**
      * @brief Subscribers for actuator commands.

@@ -53,6 +53,9 @@ Ros2Plugin::Ros2Plugin(const Config& config) :
 void Ros2Plugin::create_sensor_publishers(const mjModel* model) {
     RCLCPP_INFO(this->get_logger(), "Creating sensor publishers for %d sensors", model->nsensor);
 
+    this->clock_publisher =
+        this->create_publisher<builtin_interfaces::msg::Time>(this->ros_namespace + "clock", this->qos);
+
     for (int i = 0; i < model->nsensor; i++) {
         const char*       sensor_name = model->names + model->name_sensoradr[i];
         const std::string topic_name = this->ros_namespace + "sensors/" + std::string(sensor_name);
@@ -106,6 +109,11 @@ void Ros2Plugin::compute(const mjModel* model, mjData* data) {
         this->create_actuator_subscribers(model);
         initialized = true;
     }
+
+    builtin_interfaces::msg::Time clock_msg;
+    clock_msg.sec = static_cast<int32_t>(data->time);
+    clock_msg.nanosec = static_cast<uint32_t>((data->time - clock_msg.sec) * 1e9);
+    this->clock_publisher->publish(clock_msg);
 
     for (const auto& sensor : this->sensors) {
         int     num_dimensions = model->sensor_dim[sensor.model_index];
