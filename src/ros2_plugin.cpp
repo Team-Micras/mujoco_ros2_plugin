@@ -58,6 +58,8 @@ void Ros2Plugin::create_sensor_publishers(const mjModel* model) {
     this->clock_publisher =
         this->create_publisher<builtin_interfaces::msg::Time>(this->ros_namespace + "clock", this->qos);
 
+    RCLCPP_INFO(this->get_logger(), "Created clock publisher on topic '%sclock'", this->ros_namespace.c_str());
+
     for (int i = 0; i < model->nsensor; i++) {
         const char*       sensor_name = model->names + model->name_sensoradr[i];
         const std::string topic_name = this->ros_namespace + "sensors/" + std::string(sensor_name);
