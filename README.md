@@ -27,7 +27,9 @@ MuJoCo Plugin for integrating with ROS 2
   - [Loading the Plugin in MJCF](#loading-the-plugin-in-mjcf)
   - [Plugin Configuration](#plugin-configuration)
 - [🔄 ROS 2 Interface](#-ros-2-interface)
-  - [⬅️ Published Topics (Sensors)](#️-published-topics-sensors)
+  - [⬅️ Published Topics](#️-published-topics)
+    - [Sensor Data](#sensor-data)
+    - [Simulation Clock](#simulation-clock)
   - [➡️ Subscribed Topics (Actuators)](#️-subscribed-topics-actuators)
 - [💡 Example](#-example)
 - [👥 Contributing](#-contributing)
@@ -58,6 +60,9 @@ Mujoco ROS 2 topics plotted on [PlotJuggler](https://github.com/facontidavide/Pl
   - Publishes data from all MuJoCo sensors defined in your model.
   - Supports single-value sensors (`example_interfaces::msg::Float64`).
   - Supports multi-dimensional sensors (`example_interfaces::msg::Float64MultiArray`).
+- **Simulation Clock Publication**:
+  - Publishes MuJoCo simulation time as `builtin_interfaces::msg::Time` messages.
+  - Enables time synchronization between MuJoCo simulation and ROS 2 nodes.
 - **Actuator Command Subscription**:
   - Subscribes to ROS 2 topics for controlling MuJoCo actuators.
   - Accepts `example_interfaces::msg::Float64` for actuator inputs.
@@ -122,18 +127,18 @@ To activate the plugin, add an `<extension>` block to your MJCF model file. The 
 
 ```xml
 <mujoco>
-    <extension>
-        <plugin plugin="mujoco.ros2">
-            <instance name="ros2_plugin">
-                <!-- Optional: Configuration parameters -->
-                <!-- <config key="ros_namespace" value="mujoco/"/> -->
-                <!-- <config key="topic_queue_size" value="1"/> -->
-                <!-- <config key="topic_reliability" value="reliable"/> -->
-            </instance>
-        </plugin>
-    </extension>
+  <extension>
+    <plugin plugin="mujoco.ros2">
+      <instance name="ros2_plugin">
+        <!-- Optional: Configuration parameters -->
+        <!-- <config key="ros_namespace" value="mujoco/"/> -->
+        <!-- <config key="topic_queue_size" value="1"/> -->
+        <!-- <config key="topic_reliability" value="reliable"/> -->
+      </instance>
+    </plugin>
+  </extension>
 
-    <!-- ... rest of your MJCF model ... -->
+  <!-- ... rest of your MJCF model ... -->
 </mujoco>
 ```
 
@@ -166,7 +171,9 @@ Configure the plugin directly within the MJCF `<plugin>` tag:
 
 The plugin establishes the following ROS 2 communication channels:
 
-### ⬅️ Published Topics (Sensors)
+### ⬅️ Published Topics
+
+#### Sensor Data
 
 Data from sensors defined in the `<sensor>` section of your MJCF will be published.
 
@@ -178,6 +185,15 @@ Data from sensors defined in the `<sensor>` section of your MJCF will be publish
   - Type: `example_interfaces::msg::Float64MultiArray`
 
 Where `<sensor_name>` is the `name` attribute from the MJCF.
+
+#### Simulation Clock
+
+The plugin publishes the MuJoCo simulation time for synchronization with ROS 2 nodes.
+
+- **Clock Topic**:
+  - Topic: `<ros_namespace>clock`
+  - Type: `builtin_interfaces::msg::Time`
+  - Contains the current MuJoCo simulation time in seconds and nanoseconds.
 
 ### ➡️ Subscribed Topics (Actuators)
 
@@ -196,12 +212,12 @@ Consider this MJCF snippet for a simple car:
 ```xml
 <mujoco>
   <extension>
-      <plugin plugin="mujoco.ros2">
-        <instance name="ros2_plugin">
-          <config key="ros_namespace" value="simple_car/"/>
-        </instance>
-      </plugin>
-    </extension>
+    <plugin plugin="mujoco.ros2">
+    <instance name="ros2_plugin">
+      <config key="ros_namespace" value="simple_car/"/>
+    </instance>
+    </plugin>
+  </extension>
 
   <asset>
     <mesh name="chasis" scale=".01 .006 .0015"
@@ -257,6 +273,7 @@ Consider this MJCF snippet for a simple car:
 **This would result in:**
 
 - **Publishers**:
+  - `/simple_car/clock` (`Time`)
   - `/simple_car/sensors/left_torque` (`Float64`)
   - `/simple_car/sensors/right_torque` (`Float64`)
 - **Subscribers**:
@@ -266,6 +283,9 @@ Consider this MJCF snippet for a simple car:
 Interact using ROS 2 tools:
 
 ```bash
+# Listen to simulation clock
+ros2 topic echo /simple_car/clock
+
 # Listen to a sensor
 ros2 topic echo /simple_car/sensors/left_torque
 
