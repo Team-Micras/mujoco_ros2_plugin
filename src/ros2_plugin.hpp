@@ -158,6 +158,11 @@ private:
     rclcpp::Publisher<builtin_interfaces::msg::Time>::SharedPtr clock_publisher;
 
     /**
+     * @brief Message to hold the MuJoCo clock time.
+     */
+    builtin_interfaces::msg::Time clock_msg;
+
+    /**
      * @brief Subscribers for actuator commands.
      */
     std::vector<rclcpp::Subscription<example_interfaces::msg::Float64>::SharedPtr> actuator_subscribers;

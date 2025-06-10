@@ -53,6 +53,8 @@ Ros2Plugin::Ros2Plugin(const Config& config) :
 void Ros2Plugin::create_sensor_publishers(const mjModel* model) {
     RCLCPP_INFO(this->get_logger(), "Creating sensor publishers for %d sensors", model->nsensor);
 
+    this->clock_msg.sec = 0;
+    this->clock_msg.nanosec = 0;
     this->clock_publisher =
         this->create_publisher<builtin_interfaces::msg::Time>(this->ros_namespace + "clock", this->qos);
 
@@ -110,10 +112,12 @@ void Ros2Plugin::compute(const mjModel* model, mjData* data) {
         initialized = true;
     }
 
-    builtin_interfaces::msg::Time clock_msg;
-    clock_msg.sec = static_cast<int32_t>(data->time);
-    clock_msg.nanosec = static_cast<uint32_t>((data->time - clock_msg.sec) * 1e9);
-    this->clock_publisher->publish(clock_msg);
+    this->clock_msg.nanosec += model->opt.timestep * 1e9;
+    if (this->clock_msg.nanosec >= 1e9) {
+        this->clock_msg.sec += static_cast<int32_t>(this->clock_msg.nanosec / 1e9);
+        this->clock_msg.nanosec %= static_cast<uint32_t>(1e9);
+    }
+    this->clock_publisher->publish(this->clock_msg);
 
     for (const auto& sensor : this->sensors) {
         int     num_dimensions = model->sensor_dim[sensor.model_index];
