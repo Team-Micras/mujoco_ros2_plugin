@@ -6,5 +6,4 @@ namespace mujoco::plugin::ros2 {
 mjPLUGIN_LIB_INIT {
     Ros2Plugin::register_plugin();
 }
-
 }  // namespace mujoco::plugin::ros2

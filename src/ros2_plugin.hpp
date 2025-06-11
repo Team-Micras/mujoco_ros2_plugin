@@ -1,6 +1,7 @@
 #ifndef MUJOCO_PLUGIN_ROS2_HPP
 #define MUJOCO_PLUGIN_ROS2_HPP
 
+#include <builtin_interfaces/msg/time.hpp>
 #include <example_interfaces/msg/float64.hpp>
 #include <example_interfaces/msg/float64_multi_array.hpp>
 #include <mujoco/mjdata.h>
@@ -21,10 +22,9 @@ public:
      * @brief Configuration options for the ROS2 plugin.
      */
     struct Config {
-        std::string node_name;          // Name for the plugin ROS2 node
-        std::string ros_namespace;      // Namespace for ROS2 topics
-        int         topic_queue_size;   // Queue size for ROS2 topics
-        std::string topic_reliability;  // Reliability policy of the ROS2 topics
+        std::string node_name;                // Name for the plugin ROS2 node
+        std::string ros_namespace;            // Namespace for ROS2 topics
+        std::string subscribers_reliability;  // Reliability policy of the ROS2 subscribers
     };
 
     /**
@@ -53,9 +53,9 @@ public:
     static void register_plugin();
 
     /**
-     * @brief Get the configuration from the Mujoco model.
+     * @brief Get the configuration from the MuJoCo model.
      *
-     * This function extracts the ROS2 plugin configuration from the Mujoco model attributes.
+     * This function extracts the ROS2 plugin configuration from the MuJoCo model attributes.
      *
      * @param model MuJoCo model pointer.
      * @param instance Instance index of the plugin.
@@ -64,14 +64,6 @@ public:
     static Config get_config_from_model(const mjModel* model, int instance);
 
 private:
-    /**
-     * @brief Data structure to hold index information for sensors and actuators.
-     */
-    struct IndexData {
-        int model_index;  // Index of the object in the Mujoco model
-        int comm_index;   // Index of the object in the publisher or subscriber array.
-    };
-
     /**
      * @brief Create ROS2 publishers for sensor data.
      *
@@ -83,8 +75,9 @@ private:
      * @brief Create ROS2 subscribers for actuator commands.
      *
      * @param model MuJoCo model pointer.
+     * @param data MuJoCo data pointer.
      */
-    void create_actuator_subscribers(const mjModel* model);
+    void create_actuator_subscribers(const mjModel* model, mjData* data);
 
     /**
      * @brief ROS namespace attribute key.
@@ -92,14 +85,9 @@ private:
     static constexpr const char* attr_key_ros_namespace = "ros_namespace";
 
     /**
-     * @brief Topic queue size attribute key.
+     * @brief Subscribers reliability attribute key.
      */
-    static constexpr const char* attr_key_topic_queue_size = "topic_queue_size";
-
-    /**
-     * @brief Topic reliability attribute key.
-     */
-    static constexpr const char* attr_key_topic_reliability = "topic_reliability";
+    static constexpr const char* attr_key_subscribers_reliability = "subscribers_reliability";
 
     /**
      * @brief ROS namespace attribute default value.
@@ -107,14 +95,9 @@ private:
     static constexpr const char* attr_default_ros_namespace = "mujoco/";
 
     /**
-     * @brief Topic queue size attribute default value.
+     * @brief Subscribers reliability attribute default value.
      */
-    static constexpr int attr_default_topic_queue_size = 1;
-
-    /**
-     * @brief Topic reliability attribute default value.
-     */
-    static constexpr const char* attr_default_topic_reliability = "reliable";
+    static constexpr const char* attr_default_subscribers_reliability = "best_effort";
 
     /**
      * @brief Flag to check if the ROS2 topics have been initialized.
@@ -127,29 +110,39 @@ private:
     std::string ros_namespace;
 
     /**
-     * @brief Quality of service settings for ROS2 topics.
+     * @brief Quality of service settings for ROS2 subscribers.
      */
-    rclcpp::QoS qos;
+    rclcpp::QoS subscribers_qos;
 
     /**
-     * @brief Array to hold sensors indexes.
+     * @brief Quality of service settings for ROS2 publishers.
      */
-    std::vector<IndexData> sensors;
+    rclcpp::QoS publishers_qos;
 
     /**
-     * @brief Array to hold actuators indexes.
+     * @brief Message to hold the MuJoCo clock time.
      */
-    std::vector<IndexData> actuators;
+    builtin_interfaces::msg::Time clock_msg;
 
     /**
-     * @brief Publishers for sensor data of double type.
+     * @brief Publisher for the MuJoCo clock time.
      */
-    std::vector<rclcpp::Publisher<example_interfaces::msg::Float64>::SharedPtr> double_sensor_publishers;
+    rclcpp::Publisher<builtin_interfaces::msg::Time>::SharedPtr clock_publisher;
 
     /**
-     * @brief Publishers for sensor data of multi-array type.
+     * @brief Array to hold sensors subscribers indexes.
      */
-    std::vector<rclcpp::Publisher<example_interfaces::msg::Float64MultiArray>::SharedPtr> multiarray_sensor_publishers;
+    std::vector<unsigned int> subscribers_indexes;
+
+    /**
+     * @brief Publishers for sensor data with a single double.
+     */
+    std::vector<rclcpp::Publisher<example_interfaces::msg::Float64>::SharedPtr> scalar_sensor_publishers;
+
+    /**
+     * @brief Publishers for sensor data with an array of doubles.
+     */
+    std::vector<rclcpp::Publisher<example_interfaces::msg::Float64MultiArray>::SharedPtr> array_sensor_publishers;
 
     /**
      * @brief Subscribers for actuator commands.
